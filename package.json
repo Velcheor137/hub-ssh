@@ -1,0 +1,30 @@
+{
+  "name": "webssh",
+  "version": "1.0.0",
+  "description": "A web-based SSH client application",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs"
+  },
+  "keywords": [
+    "ssh",
+    "websocket",
+    "terminal",
+    "xterm",
+    "webssh"
+  ],
+  "author": "WebSSH Developer",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "extract-zip": "^2.0.1",
+    "sqlite3": "^5.1.7",
+    "ssh2": "^1.15.0",
+    "ws": "^8.17.1"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

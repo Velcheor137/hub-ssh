@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub.shh - Browser-based SSH Client</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Dashboard View -->
+        <div id="dashboard" class="view">
+            <header>
+                <h1>Hub.shh</h1>
+                <p></p>
+            </header>
+
+            <div class="actions-bar">
+                <div class="actions-left">
+                    <button id="add-session-btn" class="primary-btn">Add New Session</button>
+                    <button id="add-group-btn" class="secondary-btn">Add Group</button>
+                </div>
+                <div class="actions-right">
+                    <button id="sort-sessions-btn" class="secondary-btn">Sort by Name</button>
+                    <button id="toggle-view-btn" class="secondary-btn">List View</button>
+                    <button id="settings-btn" class="secondary-btn">Settings</button>
+                </div>
+            </div>
+
+            <div id="sessions-container">
+                <!-- Groups and sessions will be loaded here dynamically -->
+                <div class="empty-state">
+                    <p>No sessions yet. Add your first SSH connection!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session View -->
+        <div id="session-view" class="view hidden">
+            <div class="session-header">
+                <div class="session-header-left">
+                    <button id="back-to-dashboard" class="icon-btn">← Back</button>
+                    <h2 id="session-title">SSH Session</h2>
+                </div>
+                <div class="session-header-right">
+                    <button id="sftp-btn" class="icon-btn" title="SFTP File Browser">📁</button>
+                    <button id="edit-session-btn" class="icon-btn" title="Edit Session">✏️</button>
+                    <button id="disconnect-session-btn" class="danger-btn">Disconnect</button>
+                </div>
+            </div>
+            
+            <!-- SFTP Panel (hidden by default) -->
+            <div id="sftp-panel" class="sftp-panel hidden">
+                <div class="sftp-header">
+                    <div class="sftp-breadcrumb" id="sftp-breadcrumb">
+                        <!-- Breadcrumb will be populated dynamically -->
+                    </div>
+                    <div class="sftp-actions">
+                        <button id="sftp-upload-btn" class="secondary-btn">Upload Files…</button>
+                        <button id="sftp-download-btn" class="primary-btn" disabled>Download</button>
+                        <input type="file" id="sftp-file-input" multiple style="display: none;">
+                    </div>
+                </div>
+                <div class="sftp-file-list-container">
+                    <div class="sftp-file-list-header">
+                        <div class="sftp-checkbox-header">
+                            <input type="checkbox" id="select-all-checkbox">
+                        </div>
+                        <div class="sftp-name-header">Name</div>
+                        <div class="sftp-size-header">Size</div>
+                        <div class="sftp-modified-header">Last Modified</div>
+                    </div>
+                    <div class="sftp-file-list" id="sftp-file-list">
+                        <!-- File list will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Terminal Container -->
+            <div id="terminal-container">
+                <div id="terminal"></div>
+            </div>
+            
+            <div id="session-status-bar">
+                <span id="session-status">Disconnected</span>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settings-view" class="view hidden">
+            <div class="settings-header">
+                <button id="back-to-dashboard-settings" class="icon-btn">← Back</button>
+                <h2>Settings</h2>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Appearance</h3>
+                <div class="setting-item">
+                    <label for="theme-selector">Theme:</label>
+                    <select id="theme-selector">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="font-size">Font Size:</label>
+                    <input type="range" id="font-size" min="10" max="20" value="14">
+                    <span id="font-size-value">14px</span>
+                </div>
+                <div class="setting-item">
+                    <label for="font-family">Font Family:</label>
+                    <select id="font-family">
+                        <option value="Fira Code, Consolas, monospace">Fira Code</option>
+                        <option value="Consolas, monospace">Consolas</option>
+                        <option value="Monaco, monospace">Monaco</option>
+                        <option value="Courier New, monospace">Courier New</option>
+                        <option value="Ubuntu Mono, monospace">Ubuntu Mono</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Terminal Colors</h3>
+                <div class="color-settings">
+                    <div class="color-row">
+                        <label for="background-color">Background:</label>
+                        <input type="color" id="background-color" value="#1e1e1e">
+                        <input type="text" id="background-color-text" value="#1e1e1e" placeholder="#1e1e1e">
+                    </div>
+                    <div class="color-row">
+                        <label for="foreground-color">Foreground:</label>
+                        <input type="color" id="foreground-color" value="#d4d4d4">
+                        <input type="text" id="foreground-color-text" value="#d4d4d4" placeholder="#d4d4d4">
+                    </div>
+                    <div class="color-row">
+                        <label for="cursor-color">Cursor:</label>
+                        <input type="color" id="cursor-color" value="#64ffda">
+                        <input type="text" id="cursor-color-text" value="#64ffda" placeholder="#64ffda">
+                    </div>
+                    <div class="color-row">
+                        <label for="selection-color">Selection:</label>
+                        <input type="color" id="selection-color" value="#64ffda40">
+                        <input type="text" id="selection-color-text" value="#64ffda40" placeholder="#64ffda40">
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <button id="reset-colors-btn" class="secondary-btn">Reset to Default</button>
+                    <button id="preset-colors-btn" class="secondary-btn">Color Presets</button>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Behavior</h3>
+                <div class="setting-item">
+                    <label for="auto-connect">Auto-connect on startup:</label>
+                    <input type="checkbox" id="auto-connect">
+                </div>
+                <div class="setting-item">
+                    <label for="confirm-disconnect">Confirm before disconnecting:</label>
+                    <input type="checkbox" id="confirm-disconnect" checked>
+                </div>
+                <div class="setting-item">
+                    <label for="show-timestamps">Show timestamps in terminal:</label>
+                    <input type="checkbox" id="show-timestamps">
+                </div>
+                <div class="setting-item">
+                    <label for="terminal-bell">Enable terminal bell:</label>
+                    <input type="checkbox" id="terminal-bell" checked>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Advanced</h3>
+                <div class="setting-item">
+                    <label for="connection-timeout">Connection timeout (seconds):</label>
+                    <input type="number" id="connection-timeout" min="5" max="60" value="15">
+                </div>
+                <div class="setting-item">
+                    <label for="keepalive-interval">Keepalive interval (seconds):</label>
+                    <input type="number" id="keepalive-interval" min="5" max="300" value="15">
+                </div>
+                <div class="setting-item">
+                    <label for="terminal-scrollback">Terminal scrollback lines:</label>
+                    <input type="number" id="terminal-scrollback" min="100" max="10000" value="1000">
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Session Modal -->
+        <div id="add-session-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="session-modal-title">Add New SSH Session</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <form id="session-form">
+                    <input type="hidden" id="session-id">
+                    
+                    <div class="form-columns">
+                        <!-- Left Column -->
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="session-name">Session Name:</label>
+                                <input type="text" id="session-name" placeholder="e.g., Production Server" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="session-group">Group:</label>
+                                <select id="session-group">
+                                    <option value="">None</option>
+                                    <!-- Groups will be populated here -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="host">Host:</label>
+                                <input type="text" id="host" required placeholder="e.g., 192.168.1.1 or example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="port">Port:</label>
+                                <input type="number" id="port" value="22" min="1" max="65535">
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column -->
+                        <div class="form-column">
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" id="username" required placeholder="e.g., root">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="auth-method">Authentication Method:</label>
+                                <select id="auth-method">
+                                    <option value="password">Password</option>
+                                    <option value="privateKey">Private Key</option>
+                                </select>
+                            </div>
+                            
+                            <div id="password-auth" class="auth-method-content">
+                                <div class="form-group">
+                                    <label for="password">Password:</label>
+                                    <input type="password" id="password" placeholder="Enter password">
+                                </div>
+                            </div>
+                            
+                            <div id="key-auth" class="auth-method-content hidden">
+                                <div class="form-group full-width">
+                                    <label for="private-key">Private Key:</label>
+                                    <textarea id="private-key" placeholder="Enter your private key (OpenSSH or PEM format)"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="passphrase">Passphrase (if key is encrypted):</label>
+                                    <input type="password" id="passphrase" placeholder="Enter passphrase">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Full width elements -->
+                        <div class="form-group full-width">
+                            <div class="modal-actions">
+                                <button type="button" class="secondary-btn close-modal-btn">Cancel</button>
+                                <button type="submit" class="primary-btn">Save Session</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Group Modal -->
+        <div id="add-group-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Group</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <form id="group-form">
+                    <div class="form-group">
+                        <label for="group-name">Group Name:</label>
+                        <input type="text" id="group-name" placeholder="e.g., Production Servers" required>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="secondary-btn close-modal-btn">Cancel</button>
+                        <button type="submit" class="primary-btn">Save Group</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

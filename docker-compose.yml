@@ -1,0 +1,22 @@
+services:
+  webssh:
+    build: .
+    ports:
+      - "8443:8080"
+    volumes:
+      - /mnt/DATA1/hub/data:/app/data
+    environment:
+      - NODE_ENV=production
+      - NODE_OPTIONS=--max-old-space-size=512
+    restart: unless-stopped
+    # Performance optimizations for terminal
+    shm_size: 64m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    # Enable privileged mode for better terminal performance
+    privileged: false
+    # Add security options for better performance
+    security_opt:
+      - seccomp:unconfined
