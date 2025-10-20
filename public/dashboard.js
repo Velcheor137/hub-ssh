@@ -1815,10 +1815,16 @@ setupTerminalCopyHandler() {
                     
                     const selectedText = this.term.getSelection();
                     
-                    navigator.clipboard.writeText(selectedText).then(() => {
-                    }).catch(err => {
+                    // Проверяем доступность Clipboard API
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(selectedText).then(() => {
+                        }).catch(err => {
+                            this.fallbackCopyTextToClipboard(selectedText);
+                        });
+                    } else {
+                        // Используем fallback метод если Clipboard API недоступен
                         this.fallbackCopyTextToClipboard(selectedText);
-                    });
+                    }
                 } else {
                     // Если нет выделенного текста, просто блокируем DevTools
                     e.preventDefault();
