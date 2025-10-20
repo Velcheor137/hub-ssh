@@ -145,3 +145,4 @@ tmp/
 # Build artifacts
 build/
 dist/
+sessions.json
