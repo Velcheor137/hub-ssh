@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo "🐳 Docker Performance Test for WebSSH"
+echo "🐳 Docker Performance Test for Hub-SSH"
 echo "====================================="
 
 # Build the Docker image
 echo "📦 Building Docker image..."
-docker build -t webssh-test .
+docker build -t hub-ssh-test .
 
 # Stop any existing containers
 echo "🛑 Stopping existing containers..."
@@ -29,7 +29,7 @@ curl -s http://localhost:8443/health
 
 # Monitor container resources
 echo "📊 Container resource usage:"
-docker stats --no-stream webssh_webssh_1
+docker stats --no-stream hub-ssh_hub-ssh_1
 
 # Test terminal performance
 echo "⌨️  Testing terminal performance..."
@@ -47,4 +47,4 @@ echo "   - Monitor CPU usage during copy operations"
 
 echo ""
 echo "📝 To monitor performance in real-time:"
-echo "   docker stats webssh_webssh_1"
+echo "   docker stats hub-ssh_hub-ssh_1"

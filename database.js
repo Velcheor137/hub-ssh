@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 class Database {
     constructor() {
         this.db = null;
-        this.dbPath = path.join(__dirname, 'data', 'webssh.db');
+        this.dbPath = path.join(__dirname, 'data', 'hub-ssh.db');
     }
 
     async init() {

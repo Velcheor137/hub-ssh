@@ -1,5 +1,5 @@
 {
-  "name": "webssh",
+  "name": "hub-ssh",
   "version": "1.0.0",
   "description": "A web-based SSH client application",
   "main": "server.mjs",
@@ -13,9 +13,9 @@
     "websocket",
     "terminal",
     "xterm",
-    "webssh"
+    "hub-ssh"
   ],
-  "author": "WebSSH Developer",
+  "author": "Hub-SSH Developer",
   "license": "MIT",
   "dependencies": {
     "archiver": "^7.0.1",

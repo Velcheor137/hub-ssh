@@ -340,4 +340,4 @@ updateStatus('Ready to connect', 'disconnected');
 
 // This file is now deprecated. All functionality has been moved to dashboard.js
 // Keeping this file for backward compatibility, but it's no longer used in the new multi-session interface.
-console.log('WebSSH client loaded. Using dashboard.js for multi-session functionality.');
+console.log('Hub-SSH client loaded. Using dashboard.js for multi-session functionality.');

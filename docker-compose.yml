@@ -1,5 +1,5 @@
 services:
-  webssh:
+  hub-ssh:
     build: .
     ports:
       - "8443:8080"

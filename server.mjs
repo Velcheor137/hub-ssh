@@ -832,7 +832,7 @@ async function startServer() {
   await initDatabase();
   
   server.listen(PORT, () => {
-    console.log(`WebSSH server running on http://localhost:${PORT}`);
+    console.log(`Hub-SSH server running on http://localhost:${PORT}`);
     console.log('Database: SQLite');
   });
 }

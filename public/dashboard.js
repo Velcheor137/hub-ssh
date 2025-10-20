@@ -1,11 +1,11 @@
 // Dashboard functionality
-class WebSSHDashboard {
+class HubSSHDashboard {
     constructor() {
         this.sessions = [];
         this.groups = [];
         this.currentSession = null;
-        this.theme = localStorage.getItem('webssh-theme') || 'dark';
-        this.viewMode = localStorage.getItem('webssh-view-mode') || 'grid';
+        this.theme = localStorage.getItem('hub-ssh-theme') || 'dark';
+        this.viewMode = localStorage.getItem('hub-ssh-view-mode') || 'grid';
         this.draggedSession = null;
         this.sftpPanelVisible = false;
         this.currentSftpPath = '~'; // Start in home directory
@@ -56,7 +56,7 @@ class WebSSHDashboard {
             document.body.classList.remove('light-theme');
         }
         // Save theme preference
-        localStorage.setItem('webssh-theme', this.theme);
+        localStorage.setItem('hub-ssh-theme', this.theme);
     }
 
     setupEventListeners() {
@@ -726,7 +726,7 @@ class WebSSHDashboard {
         };
         
         // Initialize terminal session
-        this.currentSession = new WebSSHTerminal(connectData);
+        this.currentSession = new HubSSHTerminal(connectData);
         this.currentSession.connect();
         
         // Update UI
@@ -823,7 +823,7 @@ class WebSSHDashboard {
 
     toggleViewMode() {
         this.viewMode = this.viewMode === 'grid' ? 'list' : 'grid';
-        localStorage.setItem('webssh-view-mode', this.viewMode);
+        localStorage.setItem('hub-ssh-view-mode', this.viewMode);
         
         const toggleBtn = document.getElementById('toggle-view-btn');
         toggleBtn.textContent = this.viewMode === 'grid' ? 'List View' : 'Grid View';
@@ -1225,7 +1225,7 @@ class WebSSHDashboard {
 
     // Settings management methods
     loadSettings() {
-        const saved = localStorage.getItem('webssh-settings');
+        const saved = localStorage.getItem('hub-ssh-settings');
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
@@ -1240,7 +1240,7 @@ class WebSSHDashboard {
     }
 
     saveSettings() {
-        localStorage.setItem('webssh-settings', JSON.stringify(this.settings));
+        localStorage.setItem('hub-ssh-settings', JSON.stringify(this.settings));
     }
 
     applySettingsToUI() {
@@ -1429,7 +1429,7 @@ class WebSSHDashboard {
 }
 
 // Terminal session class
-class WebSSHTerminal {
+class HubSSHTerminal {
     constructor(session) {
         this.session = session;
         this.socket = null;
@@ -1977,7 +1977,7 @@ setupTerminalCopyHandler() {
 // Initialize dashboard when DOM is loaded
 let dashboard;
 document.addEventListener('DOMContentLoaded', () => {
-    dashboard = new WebSSHDashboard();
+    dashboard = new HubSSHDashboard();
     window.dashboard = dashboard; // Make it globally accessible
     
     // Add additional resize handling for terminal

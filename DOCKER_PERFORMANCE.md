@@ -1,4 +1,4 @@
-# 🐳 Docker Performance Optimization for WebSSH
+# 🐳 Docker Performance Optimization for Hub-SSH
 
 ## Проблема
 При запуске в Docker контейнере копирование текста в терминале работает медленно по сравнению с локальным запуском.
@@ -40,7 +40,7 @@ sysctl -p
 #### В docker-compose.yml:
 ```yaml
 services:
-  webssh:
+  hub-ssh:
     # ... existing config ...
     deploy:
       resources:
@@ -58,13 +58,13 @@ services:
 #### Проверка ресурсов:
 ```bash
 # Мониторинг в реальном времени
-docker stats webssh_webssh_1
+docker stats hub-ssh_hub-ssh_1
 
 # Проверка логов
-docker-compose logs -f webssh
+docker-compose logs -f hub-ssh
 
 # Проверка сетевых соединений
-docker exec webssh_webssh_1 netstat -tuln
+docker exec hub-ssh_hub-ssh_1 netstat -tuln
 ```
 
 #### Тестирование копирования:
