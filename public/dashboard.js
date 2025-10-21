@@ -28,8 +28,8 @@ class HubSSHDashboard {
                 'terminal-bell': true
             },
             advanced: {
-                'connection-timeout': 15,
-                'keepalive-interval': 15,
+                'connection-timeout': 600,
+                'keepalive-interval': 30,
                 'terminal-scrollback': 1000
             }
         };
@@ -1575,7 +1575,7 @@ class HubSSHTerminal {
                 this.socket.close();
                 this.updateStatus('Connection timeout. Please check the server.', 'error');
             }
-        }, 15000); // 15 second timeout
+        }, 600000); // 10 minute timeout
 
         this.socket.onopen = () => {
             clearTimeout(connectionTimeout);
@@ -1585,6 +1585,9 @@ class HubSSHTerminal {
                 sessionId: this.session.sessionId
             };
             this.socket.send(JSON.stringify(connectMessage));
+            
+            // Start keep-alive mechanism
+            this.startKeepAlive();
             
             // Send initial resize after connection
             setTimeout(() => {
@@ -1618,6 +1621,9 @@ class HubSSHTerminal {
 
                 // If we successfully parsed JSON, handle based on message type
                 switch (message.type) {
+                    case 'pong':
+                        // Handle pong response silently - don't send to terminal
+                        return;
                     case 'connected':
                         this.isConnected = true;
                         this.updateStatus('Connected', 'connected');
@@ -1756,7 +1762,26 @@ class HubSSHTerminal {
         }
     }
 
+    startKeepAlive() {
+        // Send ping every 30 seconds to keep connection alive
+        this.keepAliveInterval = setInterval(() => {
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                this.socket.send(JSON.stringify({ type: 'ping' }));
+            }
+        }, 30000);
+    }
+    
+    stopKeepAlive() {
+        if (this.keepAliveInterval) {
+            clearInterval(this.keepAliveInterval);
+            this.keepAliveInterval = null;
+        }
+    }
+
     disconnect() {
+        // Stop keep-alive
+        this.stopKeepAlive();
+        
         // Remove resize event listener
         if (this.resizeHandler) {
             window.removeEventListener('resize', this.resizeHandler);

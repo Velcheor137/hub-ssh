@@ -789,6 +789,9 @@ wss.on('connection', (ws, req) => {
             fileId: data.fileId
           }));
         }
+      } else if (data.type === 'ping') {
+        // Respond to ping with pong to keep connection alive
+        ws.send(JSON.stringify({ type: 'pong' }));
       } else if (data.type === 'data' && stream && isClientConnected) {
         stream.write(data.data);
       } else if (data.type === 'resize' && stream) {
